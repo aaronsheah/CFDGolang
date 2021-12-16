@@ -12,17 +12,17 @@ import (
 	"github.com/go-echarts/go-echarts/v2/types"
 )
 
-func setupInitialVelocities(c *linearconvection.OneDimensionLinearConvectionConfig) []int {
-	velocities := make([]int, c.GridPoints())
+func setupInitialVelocities(c *linearconvection.OneDimensionLinearConvectionConfig) []float64 {
+	velocities := make([]float64, c.GridPoints())
 
 	minIndexToSetToTwo := int(0.5 / c.DistanceUnit())
 	maxIndexToSetToTwo := int(1 / c.DistanceUnit())
 
 	for i := 0; i < c.GridPoints(); i++ {
 		if i >= minIndexToSetToTwo && i <= maxIndexToSetToTwo {
-			velocities[i] = 2
+			velocities[i] = 2.0
 		} else {
-			velocities[i] = 1
+			velocities[i] = 1.0
 		}
 	}
 
@@ -58,10 +58,11 @@ func httpServer(
 
 func main() {
 	gridPoints, timesteps, timeUnit, wavespeed := 41, 25, float64(0.025), 1
-	config := linearconvection.NewOneDimensionLinearConvectionConfig(gridPoints, timesteps, timeUnit, wavespeed)
-
-	velocities := setupInitialVelocities(config)
-
+	oneDimensionalLinearConvection := linearconvection.OneDimensionLinearConvection{
+		Config: *linearconvection.NewOneDimensionLinearConvectionConfig(gridPoints, timesteps, timeUnit, wavespeed),
+	}
+	velocities := setupInitialVelocities(&oneDimensionalLinearConvection.Config)
+	velocities = oneDimensionalLinearConvection.Calculate(velocities)
 	fmt.Println(velocities)
 
 	points := make([]opts.LineData, len(velocities))

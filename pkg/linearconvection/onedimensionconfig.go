@@ -35,3 +35,7 @@ func (config *OneDimensionLinearConvectionConfig) TimeUnit() float64 {
 func (config *OneDimensionLinearConvectionConfig) WaveSpeed() int {
 	return config.waveSpeed
 }
+
+func (config *OneDimensionLinearConvectionConfig) WavespeedDtDx() float64 {
+	return float64(config.WaveSpeed()) * config.TimeUnit() / config.DistanceUnit()
+}
