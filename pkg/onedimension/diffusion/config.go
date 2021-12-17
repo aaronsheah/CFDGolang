@@ -1,4 +1,4 @@
-package onedimension
+package diffusion
 
 import "math"
 

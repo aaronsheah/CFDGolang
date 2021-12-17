@@ -1,4 +1,4 @@
-package onedimension
+package convection
 
 type nonLinearConvectionConfig interface {
 	GridPoints() int
