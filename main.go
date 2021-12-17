@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"strconv"
 
-	"CFDGolang/pkg/linearconvection"
+	"CFDGolang/pkg/convection/onedimension"
 	"CFDGolang/pkg/nonlinearconvection"
 
 	"github.com/go-echarts/go-echarts/v2/charts"
@@ -13,7 +13,7 @@ import (
 	"github.com/go-echarts/go-echarts/v2/types"
 )
 
-func setupInitialVelocities(c *linearconvection.OneDimensionLinearConvectionConfig) []float64 {
+func setupInitialVelocities(c *onedimension.Config) []float64 {
 	velocities := make([]float64, c.GridPoints())
 
 	minIndexToSetToTwo := int(0.5 / c.DistanceUnit())
@@ -60,21 +60,25 @@ func httpServer(
 }
 
 func main() {
-	gridPoints, timesteps, wavespeed, courantNumber := 85, 25, 1, 0.5
+	const gridPoints, timesteps, wavespeed, courantNumber = 85, 25, 1.0, 0.5
+	config := onedimension.NewOneDimensionConfig(
+		gridPoints,
+		timesteps,
+		wavespeed,
+		courantNumber,
+	)
 
-	oneDimensionalLinearConvection := linearconvection.OneDimensionLinearConvection{
-		Config: *linearconvection.NewOneDimensionLinearConvectionConfig(gridPoints, timesteps, wavespeed, courantNumber),
-	}
+	oneDimensionalLinearConvection := onedimension.NewOneDimensionLinearConvection(config)
 	oneDimensionalNonLinearConvection := nonlinearconvection.OneDimensionNonLinearConvection{
 		Config: *nonlinearconvection.NewOneDimensionNonLinearConvectionConfig(gridPoints, timesteps, courantNumber),
 	}
 
-	velocities := setupInitialVelocities(&oneDimensionalLinearConvection.Config)
+	velocities := setupInitialVelocities(config)
 	velocitiesLinearConvection := oneDimensionalLinearConvection.Calculate(velocities)
 	velocitiesNonLinearConvection := oneDimensionalNonLinearConvection.Calculate(velocities)
 	fmt.Println("velocities", velocities)
 	fmt.Println("velocitiesLinearConvection", velocitiesLinearConvection)
-	fmt.Println("velocitiesNonLinearConvector", velocitiesNonLinearConvection)
+	fmt.Println("velocitiesNonLinearConvection", velocitiesNonLinearConvection)
 
 	initialVelocitiesLineData := make([]opts.LineData, len(velocities))
 	velocitiesLinearConvectionLineData := make([]opts.LineData, len(velocities))
