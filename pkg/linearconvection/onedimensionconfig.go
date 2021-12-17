@@ -1,18 +1,21 @@
 package linearconvection
 
 type OneDimensionLinearConvectionConfig struct {
-	gridPoints int
-	timesteps  int
-	timeUnit   float64
-	waveSpeed  int
+	gridPoints   int
+	timesteps    int
+	distanceUnit float64
+	timeUnit     float64
+	waveSpeed    int
 }
 
-func NewOneDimensionLinearConvectionConfig(gridPoints int, timesteps int, timeUnit float64, wavespeed int) *OneDimensionLinearConvectionConfig {
+func NewOneDimensionLinearConvectionConfig(gridPoints int, timesteps int, wavespeed int, courantNumber float64) *OneDimensionLinearConvectionConfig {
+	distanceUnit := float64(2) / float64(gridPoints-1)
 	return &OneDimensionLinearConvectionConfig{
-		gridPoints: gridPoints,
-		timesteps:  timesteps,
-		timeUnit:   timeUnit,
-		waveSpeed:  wavespeed,
+		gridPoints:   gridPoints,
+		timesteps:    timesteps,
+		distanceUnit: distanceUnit,
+		timeUnit:     courantNumber * distanceUnit,
+		waveSpeed:    wavespeed,
 	}
 }
 
@@ -21,7 +24,7 @@ func (config *OneDimensionLinearConvectionConfig) GridPoints() int {
 }
 
 func (config *OneDimensionLinearConvectionConfig) DistanceUnit() float64 {
-	return float64(2) / float64(config.gridPoints-1)
+	return config.distanceUnit
 }
 
 func (config *OneDimensionLinearConvectionConfig) Timesteps() int {

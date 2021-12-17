@@ -60,13 +60,13 @@ func httpServer(
 }
 
 func main() {
-	gridPoints, timesteps, timeUnit, wavespeed := 81, 25, float64(0.025), 1
+	gridPoints, timesteps, wavespeed, courantNumber := 85, 25, 1, 0.5
 
 	oneDimensionalLinearConvection := linearconvection.OneDimensionLinearConvection{
-		Config: *linearconvection.NewOneDimensionLinearConvectionConfig(gridPoints, timesteps, timeUnit, wavespeed),
+		Config: *linearconvection.NewOneDimensionLinearConvectionConfig(gridPoints, timesteps, wavespeed, courantNumber),
 	}
 	oneDimensionalNonLinearConvection := nonlinearconvection.OneDimensionNonLinearConvection{
-		Config: *nonlinearconvection.NewOneDimensionNonLinearConvectionConfig(gridPoints, timesteps, timeUnit),
+		Config: *nonlinearconvection.NewOneDimensionNonLinearConvectionConfig(gridPoints, timesteps, courantNumber),
 	}
 
 	velocities := setupInitialVelocities(&oneDimensionalLinearConvection.Config)
