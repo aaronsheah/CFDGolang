@@ -30,7 +30,7 @@ func setupInitialVelocities(c *linearconvection.OneDimensionLinearConvectionConf
 }
 
 func httpServer(
-	lineDatum []opts.LineData,
+	lineDatum [][]opts.LineData,
 	xAxisLabels []string,
 ) func(w http.ResponseWriter, _ *http.Request) {
 	return func(w http.ResponseWriter, _ *http.Request) {
@@ -44,7 +44,9 @@ func httpServer(
 			}))
 
 		line.SetXAxis(xAxisLabels)
-		line.AddSeries("Test", lineDatum)
+		for i, lineData := range lineDatum {
+			line.AddSeries(strconv.Itoa(i), lineData)
+		}
 		line.SetSeriesOptions(
 			charts.WithLineChartOpts((opts.LineChart{
 				Smooth: true,
@@ -62,18 +64,25 @@ func main() {
 		Config: *linearconvection.NewOneDimensionLinearConvectionConfig(gridPoints, timesteps, timeUnit, wavespeed),
 	}
 	velocities := setupInitialVelocities(&oneDimensionalLinearConvection.Config)
-	velocities = oneDimensionalLinearConvection.Calculate(velocities)
+	velocitiesLinearConvection := oneDimensionalLinearConvection.Calculate(velocities)
 	fmt.Println(velocities)
 
-	points := make([]opts.LineData, len(velocities))
+	initialVelocitiesLineData := make([]opts.LineData, len(velocities))
+	velocitiesLinearConvectionLineData := make([]opts.LineData, len(velocities))
 	xAxisLabels := make([]string, len(velocities))
 	for i := 0; i < len(velocities); i++ {
-		points[i] = opts.LineData{
+		initialVelocitiesLineData[i] = opts.LineData{
 			Value: velocities[i],
+		}
+		velocitiesLinearConvectionLineData[i] = opts.LineData{
+			Value: velocitiesLinearConvection[i],
 		}
 		xAxisLabels[i] = strconv.Itoa(i)
 	}
 
-	http.HandleFunc("/", httpServer(points, xAxisLabels))
+	http.HandleFunc("/", httpServer([][]opts.LineData{
+		initialVelocitiesLineData,
+		velocitiesLinearConvectionLineData,
+	}, xAxisLabels))
 	http.ListenAndServe(":1234", nil)
 }
