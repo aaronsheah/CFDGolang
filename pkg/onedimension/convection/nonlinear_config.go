@@ -1,8 +1,7 @@
-package onedimension
+package convection
 
 type nonLinearConvectionConfig interface {
+	convectionConfig
 	GridPoints() int
 	Timesteps() int
-	TimeUnit() float64
-	DistanceUnit() float64
 }

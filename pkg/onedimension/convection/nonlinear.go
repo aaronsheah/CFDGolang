@@ -1,4 +1,4 @@
-package onedimension
+package convection
 
 type nonLinearConvection struct {
 	gridPoints int
@@ -10,7 +10,7 @@ func NewNonLinearConvection(config nonLinearConvectionConfig) *nonLinearConvecti
 	return &nonLinearConvection{
 		gridPoints: config.GridPoints(),
 		timesteps:  config.Timesteps(),
-		dtByDx:     config.TimeUnit() / config.DistanceUnit(),
+		dtByDx:     timeUnit(config) / config.DistanceUnit(),
 	}
 }
 

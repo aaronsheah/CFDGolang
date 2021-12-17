@@ -5,16 +5,25 @@ type Config struct {
 	timesteps     int
 	wavespeed     float64
 	courantNumber float64
+	viscosity     float64
+	sigma         float64
 }
 
 func NewConfig(
-	gridPoints int, timesteps int, wavespeed float64, courantNumber float64,
+	gridPoints int,
+	timesteps int,
+	wavespeed float64,
+	courantNumber float64,
+	viscosity float64,
+	sigma float64,
 ) *Config {
 	return &Config{
 		gridPoints:    gridPoints,
 		timesteps:     timesteps,
 		wavespeed:     wavespeed,
 		courantNumber: courantNumber,
+		viscosity:     viscosity,
+		sigma:         sigma,
 	}
 }
 
@@ -38,6 +47,10 @@ func (c *Config) DistanceUnit() float64 {
 	return float64(2) / float64(c.GridPoints()-1)
 }
 
-func (c *Config) TimeUnit() float64 {
-	return c.DistanceUnit() * c.CourantNumber()
+func (c *Config) Viscosity() float64 {
+	return c.viscosity
+}
+
+func (c *Config) Sigma() float64 {
+	return c.sigma
 }

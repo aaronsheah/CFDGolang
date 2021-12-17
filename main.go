@@ -5,15 +5,16 @@ import (
 	"net/http"
 	"strconv"
 
-	oneDimensionConvection "CFDGolang/pkg/convection/onedimension"
-	oneDimensionDiffusion "CFDGolang/pkg/diffusion/onedimension"
+	"CFDGolang/pkg/onedimension"
+	"CFDGolang/pkg/onedimension/convection"
+	"CFDGolang/pkg/onedimension/diffusion"
 
 	"github.com/go-echarts/go-echarts/v2/charts"
 	"github.com/go-echarts/go-echarts/v2/opts"
 	"github.com/go-echarts/go-echarts/v2/types"
 )
 
-func setupInitialVelocities(c *oneDimensionConvection.Config) []float64 {
+func setupInitialVelocities(c *onedimension.Config) []float64 {
 	velocities := make([]float64, c.GridPoints())
 
 	minIndexToSetToTwo := int(0.5 / c.DistanceUnit())
@@ -61,23 +62,24 @@ func httpServer(
 
 func main() {
 	const gridPoints, timesteps, wavespeed, courantNumber = 85, 25, 1.0, 0.5
-	oneDimensionConvectionConfig := oneDimensionConvection.NewConfig(
+	const viscosity, sigma = 0.3, 0.2
+	oneDimensionConfig := onedimension.NewConfig(
 		gridPoints,
 		timesteps,
 		wavespeed,
 		courantNumber,
+		viscosity,
+		sigma,
 	)
 
-	oneDimensionalLinearConvection := oneDimensionConvection.NewLinearConvection(oneDimensionConvectionConfig)
-	oneDimensionalNonLinearConvection := oneDimensionConvection.NewNonLinearConvection(oneDimensionConvectionConfig)
+	linearConvection := convection.NewLinearConvection(oneDimensionConfig)
+	nonLinearConvection := convection.NewNonLinearConvection(oneDimensionConfig)
+	diffusion := diffusion.NewDiffusion(oneDimensionConfig)
 
-	const viscosity, sigma = 0.3, 0.2
-	oneDimensionDiffusion := oneDimensionDiffusion.NewDiffusion(oneDimensionDiffusion.NewConfig(gridPoints, timesteps, viscosity, sigma))
-
-	velocities := setupInitialVelocities(oneDimensionConvectionConfig)
-	velocitiesLinearConvection := oneDimensionalLinearConvection.Calculate(velocities)
-	velocitiesNonLinearConvection := oneDimensionalNonLinearConvection.Calculate(velocities)
-	velocitiesDiffusion := oneDimensionDiffusion.Calculate(velocities)
+	velocities := setupInitialVelocities(oneDimensionConfig)
+	velocitiesLinearConvection := linearConvection.Calculate(velocities)
+	velocitiesNonLinearConvection := nonLinearConvection.Calculate(velocities)
+	velocitiesDiffusion := diffusion.Calculate(velocities)
 
 	fmt.Println("velocities", velocities)
 	fmt.Println("velocitiesLinearConvection", velocitiesLinearConvection)
