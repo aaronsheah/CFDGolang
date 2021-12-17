@@ -6,6 +6,7 @@ import (
 	"strconv"
 
 	"CFDGolang/pkg/linearconvection"
+	"CFDGolang/pkg/nonlinearconvection"
 
 	"github.com/go-echarts/go-echarts/v2/charts"
 	"github.com/go-echarts/go-echarts/v2/opts"
@@ -30,7 +31,7 @@ func setupInitialVelocities(c *linearconvection.OneDimensionLinearConvectionConf
 }
 
 func httpServer(
-	lineDatum [][]opts.LineData,
+	titleToLineData map[string][]opts.LineData,
 	xAxisLabels []string,
 ) func(w http.ResponseWriter, _ *http.Request) {
 	return func(w http.ResponseWriter, _ *http.Request) {
@@ -44,8 +45,8 @@ func httpServer(
 			}))
 
 		line.SetXAxis(xAxisLabels)
-		for i, lineData := range lineDatum {
-			line.AddSeries(strconv.Itoa(i), lineData)
+		for title, lineData := range titleToLineData {
+			line.AddSeries(title, lineData)
 		}
 		line.SetSeriesOptions(
 			charts.WithLineChartOpts((opts.LineChart{
@@ -60,15 +61,23 @@ func httpServer(
 
 func main() {
 	gridPoints, timesteps, timeUnit, wavespeed := 41, 25, float64(0.025), 1
+
 	oneDimensionalLinearConvection := linearconvection.OneDimensionLinearConvection{
 		Config: *linearconvection.NewOneDimensionLinearConvectionConfig(gridPoints, timesteps, timeUnit, wavespeed),
 	}
+	oneDimensionalNonLinearConvection := nonlinearconvection.OneDimensionNonLinearConvection{
+		Config: *nonlinearconvection.NewOneDimensionNonLinearConvectionConfig(gridPoints, timesteps, timeUnit),
+	}
+
 	velocities := setupInitialVelocities(&oneDimensionalLinearConvection.Config)
 	velocitiesLinearConvection := oneDimensionalLinearConvection.Calculate(velocities)
+	velocitiesNonLinearConvector := oneDimensionalNonLinearConvection.Calculate(velocities)
 	fmt.Println(velocities)
 
 	initialVelocitiesLineData := make([]opts.LineData, len(velocities))
 	velocitiesLinearConvectionLineData := make([]opts.LineData, len(velocities))
+	velocitiesNonLinearConvectionLineData := make([]opts.LineData, len(velocities))
+
 	xAxisLabels := make([]string, len(velocities))
 	for i := 0; i < len(velocities); i++ {
 		initialVelocitiesLineData[i] = opts.LineData{
@@ -77,12 +86,16 @@ func main() {
 		velocitiesLinearConvectionLineData[i] = opts.LineData{
 			Value: velocitiesLinearConvection[i],
 		}
-		xAxisLabels[i] = strconv.Itoa(i)
+		velocitiesNonLinearConvectionLineData[i] = opts.LineData{
+			Value: velocitiesNonLinearConvector[i],
+		}
+		xAxisLabels[i] = strconv.FormatFloat(float64(i)/float64(len(velocities)), 'f', 2, 64)
 	}
 
-	http.HandleFunc("/", httpServer([][]opts.LineData{
-		initialVelocitiesLineData,
-		velocitiesLinearConvectionLineData,
+	http.HandleFunc("/", httpServer(map[string][]opts.LineData{
+		"Intitial Velocities":      initialVelocitiesLineData,
+		"1D Linear Convection":     velocitiesLinearConvectionLineData,
+		"1D Non Linear Convection": velocitiesNonLinearConvectionLineData,
 	}, xAxisLabels))
 	http.ListenAndServe(":1234", nil)
 }
