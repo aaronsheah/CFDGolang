@@ -7,7 +7,7 @@ type Config struct {
 	courantNumber float64
 }
 
-func NewOneDimensionConfig(
+func NewConfig(
 	gridPoints int, timesteps int, wavespeed float64, courantNumber float64,
 ) *Config {
 	return &Config{

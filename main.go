@@ -6,7 +6,6 @@ import (
 	"strconv"
 
 	"CFDGolang/pkg/convection/onedimension"
-	"CFDGolang/pkg/nonlinearconvection"
 
 	"github.com/go-echarts/go-echarts/v2/charts"
 	"github.com/go-echarts/go-echarts/v2/opts"
@@ -61,17 +60,15 @@ func httpServer(
 
 func main() {
 	const gridPoints, timesteps, wavespeed, courantNumber = 85, 25, 1.0, 0.5
-	config := onedimension.NewOneDimensionConfig(
+	config := onedimension.NewConfig(
 		gridPoints,
 		timesteps,
 		wavespeed,
 		courantNumber,
 	)
 
-	oneDimensionalLinearConvection := onedimension.NewOneDimensionLinearConvection(config)
-	oneDimensionalNonLinearConvection := nonlinearconvection.OneDimensionNonLinearConvection{
-		Config: *nonlinearconvection.NewOneDimensionNonLinearConvectionConfig(gridPoints, timesteps, courantNumber),
-	}
+	oneDimensionalLinearConvection := onedimension.NewLinearConvection(config)
+	oneDimensionalNonLinearConvection := onedimension.NewNonLinearConvection(config)
 
 	velocities := setupInitialVelocities(config)
 	velocitiesLinearConvection := oneDimensionalLinearConvection.Calculate(velocities)
