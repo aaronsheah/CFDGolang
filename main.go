@@ -60,7 +60,7 @@ func httpServer(
 }
 
 func main() {
-	gridPoints, timesteps, timeUnit, wavespeed := 41, 25, float64(0.025), 1
+	gridPoints, timesteps, timeUnit, wavespeed := 81, 25, float64(0.025), 1
 
 	oneDimensionalLinearConvection := linearconvection.OneDimensionLinearConvection{
 		Config: *linearconvection.NewOneDimensionLinearConvectionConfig(gridPoints, timesteps, timeUnit, wavespeed),
@@ -71,8 +71,10 @@ func main() {
 
 	velocities := setupInitialVelocities(&oneDimensionalLinearConvection.Config)
 	velocitiesLinearConvection := oneDimensionalLinearConvection.Calculate(velocities)
-	velocitiesNonLinearConvector := oneDimensionalNonLinearConvection.Calculate(velocities)
-	fmt.Println(velocities)
+	velocitiesNonLinearConvection := oneDimensionalNonLinearConvection.Calculate(velocities)
+	fmt.Println("velocities", velocities)
+	fmt.Println("velocitiesLinearConvection", velocitiesLinearConvection)
+	fmt.Println("velocitiesNonLinearConvector", velocitiesNonLinearConvection)
 
 	initialVelocitiesLineData := make([]opts.LineData, len(velocities))
 	velocitiesLinearConvectionLineData := make([]opts.LineData, len(velocities))
@@ -87,7 +89,7 @@ func main() {
 			Value: velocitiesLinearConvection[i],
 		}
 		velocitiesNonLinearConvectionLineData[i] = opts.LineData{
-			Value: velocitiesNonLinearConvector[i],
+			Value: velocitiesNonLinearConvection[i],
 		}
 		xAxisLabels[i] = strconv.FormatFloat(float64(i)/float64(len(velocities)), 'f', 2, 64)
 	}
