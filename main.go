@@ -62,23 +62,24 @@ func httpServer(
 
 func main() {
 	const gridPoints, timesteps, wavespeed, courantNumber = 85, 25, 1.0, 0.5
-	oneDimensionConvectionConfig := onedimension.NewConfig(
+	const viscosity, sigma = 0.3, 0.2
+	oneDimensionConfig := onedimension.NewConfig(
 		gridPoints,
 		timesteps,
 		wavespeed,
 		courantNumber,
+		viscosity,
+		sigma,
 	)
 
-	linearConvection := convection.NewLinearConvection(oneDimensionConvectionConfig)
-	nonLinearConvection := convection.NewNonLinearConvection(oneDimensionConvectionConfig)
+	linearConvection := convection.NewLinearConvection(oneDimensionConfig)
+	nonLinearConvection := convection.NewNonLinearConvection(oneDimensionConfig)
+	diffusion := diffusion.NewDiffusion(oneDimensionConfig)
 
-	const viscosity, sigma = 0.3, 0.2
-	oneDimensionDiffusion := diffusion.NewDiffusion(diffusion.NewConfig(gridPoints, timesteps, viscosity, sigma))
-
-	velocities := setupInitialVelocities(oneDimensionConvectionConfig)
+	velocities := setupInitialVelocities(oneDimensionConfig)
 	velocitiesLinearConvection := linearConvection.Calculate(velocities)
 	velocitiesNonLinearConvection := nonLinearConvection.Calculate(velocities)
-	velocitiesDiffusion := oneDimensionDiffusion.Calculate(velocities)
+	velocitiesDiffusion := diffusion.Calculate(velocities)
 
 	fmt.Println("velocities", velocities)
 	fmt.Println("velocitiesLinearConvection", velocitiesLinearConvection)

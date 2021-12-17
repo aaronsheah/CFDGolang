@@ -10,7 +10,7 @@ func NewLinearConvection(config linearConvectionConfig) *linearConvection {
 	return &linearConvection{
 		gridPoints:      config.GridPoints(),
 		timesteps:       config.Timesteps(),
-		wavespeedDtByDx: config.Wavespeed() * config.TimeUnit() / config.DistanceUnit(),
+		wavespeedDtByDx: config.Wavespeed() * timeUnit(config) / config.DistanceUnit(),
 	}
 }
 

@@ -14,7 +14,7 @@ func NewDiffusion(c diffusionConfig) *diffusion {
 	return &diffusion{
 		gridPoints:     c.GridPoints(),
 		timesteps:      c.Timesteps(),
-		vDtByDxSquared: c.Viscosity() * c.TimeUnit() / math.Pow(c.DistanceUnit(), 2),
+		vDtByDxSquared: c.Viscosity() * timeUnit(c) / math.Pow(c.DistanceUnit(), 2),
 	}
 }
 
