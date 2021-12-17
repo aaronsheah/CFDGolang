@@ -5,14 +5,14 @@ import (
 	"net/http"
 	"strconv"
 
-	"CFDGolang/pkg/convection/onedimension"
+	oneDimensionConvection "CFDGolang/pkg/convection/onedimension"
 
 	"github.com/go-echarts/go-echarts/v2/charts"
 	"github.com/go-echarts/go-echarts/v2/opts"
 	"github.com/go-echarts/go-echarts/v2/types"
 )
 
-func setupInitialVelocities(c *onedimension.Config) []float64 {
+func setupInitialVelocities(c *oneDimensionConvection.Config) []float64 {
 	velocities := make([]float64, c.GridPoints())
 
 	minIndexToSetToTwo := int(0.5 / c.DistanceUnit())
@@ -60,15 +60,15 @@ func httpServer(
 
 func main() {
 	const gridPoints, timesteps, wavespeed, courantNumber = 85, 25, 1.0, 0.5
-	config := onedimension.NewConfig(
+	config := oneDimensionConvection.NewConfig(
 		gridPoints,
 		timesteps,
 		wavespeed,
 		courantNumber,
 	)
 
-	oneDimensionalLinearConvection := onedimension.NewLinearConvection(config)
-	oneDimensionalNonLinearConvection := onedimension.NewNonLinearConvection(config)
+	oneDimensionalLinearConvection := oneDimensionConvection.NewLinearConvection(config)
+	oneDimensionalNonLinearConvection := oneDimensionConvection.NewNonLinearConvection(config)
 
 	velocities := setupInitialVelocities(config)
 	velocitiesLinearConvection := oneDimensionalLinearConvection.Calculate(velocities)
