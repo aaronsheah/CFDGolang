@@ -2,10 +2,12 @@ package main
 
 import (
 	"fmt"
+	"math"
 	"net/http"
 	"strconv"
 
 	"CFDGolang/pkg/onedimension"
+	"CFDGolang/pkg/onedimension/burgers"
 	"CFDGolang/pkg/onedimension/convection"
 	"CFDGolang/pkg/onedimension/diffusion"
 
@@ -61,8 +63,8 @@ func httpServer(
 }
 
 func main() {
-	const gridPoints, timesteps, wavespeed, courantNumber = 85, 25, 1.0, 0.5
-	const viscosity, sigma = 0.3, 0.2
+	const gridPoints, timesteps, wavespeed, courantNumber = 101, 100, 1.0, 0.5
+	const viscosity, sigma = 0.07, 0.2
 	oneDimensionConfig := onedimension.NewConfig(
 		gridPoints,
 		timesteps,
@@ -76,20 +78,33 @@ func main() {
 	nonLinearConvection := convection.NewNonLinearConvection(oneDimensionConfig)
 	diffusion := diffusion.NewDiffusion(oneDimensionConfig)
 
-	velocities := setupInitialVelocities(oneDimensionConfig)
+	fmt.Println(gridPoints, timesteps, oneDimensionConfig.DistanceUnit(), viscosity, burgers.TimeUnit(oneDimensionConfig))
+	burgersEquation := burgers.NewBurgers(oneDimensionConfig)
+
+	velocities := burgers.InitialVelocities(gridPoints, 0, viscosity)
 	velocitiesLinearConvection := linearConvection.Calculate(velocities)
 	velocitiesNonLinearConvection := nonLinearConvection.Calculate(velocities)
 	velocitiesDiffusion := diffusion.Calculate(velocities)
+	velocitiesBurgers := burgersEquation.Calculate(velocities)
+	velocitiesAnalytical := burgers.InitialVelocities(
+		gridPoints,
+		float64(timesteps)*burgers.TimeUnit(oneDimensionConfig),
+		viscosity,
+	)
 
 	fmt.Println("velocities", velocities)
 	fmt.Println("velocitiesLinearConvection", velocitiesLinearConvection)
 	fmt.Println("velocitiesNonLinearConvection", velocitiesNonLinearConvection)
 	fmt.Println("velocitiesDiffusion", velocitiesDiffusion)
+	fmt.Println("velocitiesBurgers", velocitiesBurgers)
+	fmt.Println("velocitiesAnalytical", velocitiesAnalytical)
 
 	initialVelocitiesLineData := make([]opts.LineData, len(velocities))
 	velocitiesLinearConvectionLineData := make([]opts.LineData, len(velocities))
 	velocitiesNonLinearConvectionLineData := make([]opts.LineData, len(velocities))
 	velocitiesDiffusionLineData := make([]opts.LineData, len(velocities))
+	velocitiesBurgersLineData := make([]opts.LineData, len(velocities))
+	velocitiesAnalyticalLineData := make([]opts.LineData, len(velocities))
 
 	xAxisLabels := make([]string, len(velocities))
 	for i := 0; i < len(velocities); i++ {
@@ -105,14 +120,22 @@ func main() {
 		velocitiesDiffusionLineData[i] = opts.LineData{
 			Value: velocitiesDiffusion[i],
 		}
-		xAxisLabels[i] = strconv.FormatFloat(float64(i)/float64(len(velocities)), 'f', 2, 64)
+		velocitiesBurgersLineData[i] = opts.LineData{
+			Value: velocitiesBurgers[i],
+		}
+		velocitiesAnalyticalLineData[i] = opts.LineData{
+			Value: velocitiesAnalytical[i],
+		}
+		xAxisLabels[i] = strconv.FormatFloat(float64(i)/float64(2*math.Pi), 'f', 2, 64)
 	}
 
 	http.HandleFunc("/", httpServer(map[string][]opts.LineData{
-		"Intitial Velocities":      initialVelocitiesLineData,
-		"1D Linear Convection":     velocitiesLinearConvectionLineData,
-		"1D Non Linear Convection": velocitiesNonLinearConvectionLineData,
-		"1D Diffusion":             velocitiesDiffusionLineData,
+		"Intitial Velocities":  initialVelocitiesLineData,
+		"Analyical Velocities": velocitiesAnalyticalLineData,
+		"1D Linear Convection": velocitiesLinearConvectionLineData,
+		// "1D Non Linear Convection": velocitiesNonLinearConvectionLineData,
+		"1D Diffusion": velocitiesDiffusionLineData,
+		"Burgers":      velocitiesBurgersLineData,
 	}, xAxisLabels))
 	http.ListenAndServe(":1234", nil)
 }

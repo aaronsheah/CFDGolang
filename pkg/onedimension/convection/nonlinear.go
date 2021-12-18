@@ -24,8 +24,11 @@ func (nlc *nonLinearConvection) singleTimestep(velocities []float64) []float64 {
 }
 
 func (nlc *nonLinearConvection) Calculate(velocities []float64) []float64 {
+	output := make([]float64, len(velocities))
+	copy(output, velocities)
+
 	for t := 0; t < nlc.timesteps; t++ {
-		velocities = nlc.singleTimestep(velocities)
+		output = nlc.singleTimestep(output)
 	}
-	return velocities
+	return output
 }
