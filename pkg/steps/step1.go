@@ -1,4 +1,4 @@
-package step1
+package steps
 
 import (
 	"CFDGolang/pkg/onedimension/convection"
@@ -16,7 +16,7 @@ type step1Config interface {
 	convection.LinearConvectionConfig
 }
 
-func Chart(c step1Config) components.Charter {
+func Step1Chart(c step1Config) components.Charter {
 	line := charts.NewLine()
 	line.SetSeriesOptions(
 		charts.WithLabelOpts(opts.Label{

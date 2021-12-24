@@ -11,7 +11,7 @@ import (
 	"CFDGolang/pkg/onedimension/convection"
 	"CFDGolang/pkg/onedimension/diffusion"
 	"CFDGolang/pkg/onedimension/velocityfunction"
-	"CFDGolang/pkg/step1"
+	"CFDGolang/pkg/steps"
 
 	"github.com/go-echarts/go-echarts/v2/charts"
 	"github.com/go-echarts/go-echarts/v2/components"
@@ -47,7 +47,8 @@ func httpServer(
 		)
 
 		page.AddCharts(
-			step1.Chart(config),
+			steps.Step1Chart(config),
+			steps.Step2Chart(config),
 			line,
 		)
 		page.Render(w)
