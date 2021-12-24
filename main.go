@@ -10,28 +10,12 @@ import (
 	"CFDGolang/pkg/onedimension/burgers"
 	"CFDGolang/pkg/onedimension/convection"
 	"CFDGolang/pkg/onedimension/diffusion"
+	"CFDGolang/pkg/onedimension/velocityfunction"
 
 	"github.com/go-echarts/go-echarts/v2/charts"
 	"github.com/go-echarts/go-echarts/v2/opts"
 	"github.com/go-echarts/go-echarts/v2/types"
 )
-
-func setupInitialVelocities(c *onedimension.Config) []float64 {
-	velocities := make([]float64, c.GridPoints())
-
-	minIndexToSetToTwo := int(0.5 / c.DistanceUnit())
-	maxIndexToSetToTwo := int(1 / c.DistanceUnit())
-
-	for i := 0; i < c.GridPoints(); i++ {
-		if i >= minIndexToSetToTwo && i <= maxIndexToSetToTwo {
-			velocities[i] = 2.0
-		} else {
-			velocities[i] = 1.0
-		}
-	}
-
-	return velocities
-}
 
 func httpServer(
 	titleToLineData map[string][]opts.LineData,
@@ -81,12 +65,12 @@ func main() {
 	fmt.Println(gridPoints, timesteps, oneDimensionConfig.DistanceUnit(), viscosity, burgers.TimeUnit(oneDimensionConfig))
 	burgersEquation := burgers.NewBurgers(oneDimensionConfig)
 
-	velocities := burgers.InitialVelocities(gridPoints, 0, viscosity)
+	velocities := velocityfunction.SawTooth(gridPoints, 0, viscosity)
 	velocitiesLinearConvection := linearConvection.Calculate(velocities)
 	velocitiesNonLinearConvection := nonLinearConvection.Calculate(velocities)
 	velocitiesDiffusion := diffusion.Calculate(velocities)
 	velocitiesBurgers := burgersEquation.Calculate(velocities)
-	velocitiesAnalytical := burgers.InitialVelocities(
+	velocitiesAnalytical := velocityfunction.SawTooth(
 		gridPoints,
 		float64(timesteps)*burgers.TimeUnit(oneDimensionConfig),
 		viscosity,
