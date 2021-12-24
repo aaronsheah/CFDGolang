@@ -1,5 +1,7 @@
 package onedimension
 
+import "math"
+
 type Config struct {
 	gridPoints    int
 	timesteps     int
@@ -44,7 +46,7 @@ func (c *Config) CourantNumber() float64 {
 }
 
 func (c *Config) DistanceUnit() float64 {
-	return float64(2) / float64(c.GridPoints()-1)
+	return float64(2) * math.Pi / float64(c.GridPoints()-1)
 }
 
 func (c *Config) Viscosity() float64 {

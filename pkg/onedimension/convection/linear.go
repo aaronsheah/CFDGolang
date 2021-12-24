@@ -24,8 +24,11 @@ func (lc *linearConvection) singleTimestep(velocities []float64) []float64 {
 }
 
 func (lc *linearConvection) Calculate(velocities []float64) []float64 {
+	output := make([]float64, len(velocities))
+	copy(output, velocities)
+
 	for t := 0; t < lc.timesteps; t++ {
-		velocities = lc.singleTimestep(velocities)
+		output = lc.singleTimestep(output)
 	}
-	return velocities
+	return output
 }
