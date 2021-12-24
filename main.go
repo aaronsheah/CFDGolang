@@ -49,6 +49,7 @@ func httpServer(
 		page.AddCharts(
 			steps.Step1Chart(config),
 			steps.Step2Chart(config),
+			steps.Step3Chart(config),
 			line,
 		)
 		page.Render(w)

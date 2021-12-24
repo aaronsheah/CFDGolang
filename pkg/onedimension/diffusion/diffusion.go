@@ -10,7 +10,7 @@ type diffusion struct {
 	vDtByDxSquared float64
 }
 
-func NewDiffusion(c diffusionConfig) *diffusion {
+func NewDiffusion(c DiffusionConfig) *diffusion {
 	return &diffusion{
 		gridPoints:     c.GridPoints(),
 		timesteps:      c.Timesteps(),
