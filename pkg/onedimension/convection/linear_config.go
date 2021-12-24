@@ -1,6 +1,6 @@
 package convection
 
-type linearConvectionConfig interface {
+type LinearConvectionConfig interface {
 	convectionConfig
 	GridPoints() int
 	Timesteps() int
