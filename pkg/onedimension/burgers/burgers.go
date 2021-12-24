@@ -6,7 +6,7 @@ type burgers struct {
 	dtByDx         float64
 }
 
-func NewBurgers(config burgersConfig) *burgers {
+func NewBurgers(config BurgersConfig) *burgers {
 	dtByDx := TimeUnit(config) / config.DistanceUnit()
 	vDtByDxSquared := config.Viscosity() * dtByDx / config.DistanceUnit()
 	return &burgers{

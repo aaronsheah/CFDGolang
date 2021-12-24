@@ -1,7 +1,6 @@
 package velocityfunction
 
 import (
-	"fmt"
 	"math"
 )
 
@@ -14,11 +13,6 @@ func SawTooth(gridPoints int, time float64, viscosity float64) []float64 {
 			time,
 			float64(viscosity),
 		)
-		fmt.Println("dPhiByDxDividedByPhi", dPhiByDxDividedByPhi(
-			x,
-			time,
-			float64(viscosity),
-		))
 	}
 	return velocities
 }
