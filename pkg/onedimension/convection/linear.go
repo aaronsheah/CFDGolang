@@ -6,7 +6,7 @@ type linearConvection struct {
 	wavespeedDtByDx float64
 }
 
-func NewLinearConvection(config linearConvectionConfig) *linearConvection {
+func NewLinearConvection(config LinearConvectionConfig) *linearConvection {
 	return &linearConvection{
 		gridPoints:      config.GridPoints(),
 		timesteps:       config.Timesteps(),

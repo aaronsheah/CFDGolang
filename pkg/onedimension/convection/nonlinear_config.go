@@ -1,6 +1,6 @@
 package convection
 
-type nonLinearConvectionConfig interface {
+type NonLinearConvectionConfig interface {
 	convectionConfig
 	GridPoints() int
 	Timesteps() int

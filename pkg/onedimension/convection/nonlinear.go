@@ -6,7 +6,7 @@ type nonLinearConvection struct {
 	dtByDx     float64
 }
 
-func NewNonLinearConvection(config nonLinearConvectionConfig) *nonLinearConvection {
+func NewNonLinearConvection(config NonLinearConvectionConfig) *nonLinearConvection {
 	return &nonLinearConvection{
 		gridPoints: config.GridPoints(),
 		timesteps:  config.Timesteps(),

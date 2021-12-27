@@ -1,11 +1,10 @@
-package burgers
+package velocityfunction
 
 import (
-	"fmt"
 	"math"
 )
 
-func InitialVelocities(gridPoints int, time float64, viscosity float64) []float64 {
+func SawTooth(gridPoints int, time float64, viscosity float64) []float64 {
 	velocities := make([]float64, gridPoints)
 	for i := 0; i < len(velocities); i++ {
 		x := float64(i) / float64(gridPoints) * (2 * math.Pi)
@@ -14,11 +13,6 @@ func InitialVelocities(gridPoints int, time float64, viscosity float64) []float6
 			time,
 			float64(viscosity),
 		)
-		fmt.Println("dPhiByDxDividedByPhi", dPhiByDxDividedByPhi(
-			x,
-			time,
-			float64(viscosity),
-		))
 	}
 	return velocities
 }
